@@ -1,0 +1,105 @@
+* npm rule for specifying version
+- IN general, version number follow semver rule which has 3 values: MAJOR.MINOR.PATCH
+
+Understanding Package Version Numbers: MAJOR.MINOR.PATCH
+In the world of software development, especially when dealing with libraries and packages, version numbers follow a standard format known as Semantic Versioning (SemVer). This format uses three numbers separated by periods: MAJOR, MINOR, and PATCH. Each number represents a different level of change to the package:
+
+MAJOR Version
+Meaning: Indicates a significant change to the API that could break existing code.
+When to Increment: When you introduce incompatible changes, such as removing features, renaming functions, or changing data structures.
+MINOR Version
+Meaning: Indicates a new feature added to the API that is backward-compatible.
+When to Increment: When you add functionality without breaking existing code.
+PATCH Version
+Meaning: Indicates bug fixes or other backward-compatible improvements.
+When to Increment: When you fix bugs or make minor changes that don't affect the API.
+
+Caret-character
+- Adding postfix ~ to allow update the all patch (not change MAJOR and MINOR but the PATCH always be the latest) (~1.2.8) similar to 1.2.x with x is any
+
+- Adding postfix ^ to allow update the all minor and patch within major (not change MAJOR) (^1.2.8) similar to 1.x.x with x is any
+
+An HTML server usually has one or more directories that are accessible by the user. You can place there the static assets needed by your application (stylesheets, scripts, images).
+
+In Express, you can put in place this functionality using the middleware express.static(path), where the path parameter is the absolute path of the folder containing the assets.
+
+If you don’t know what middleware is... don’t worry, we will discuss in detail later. Basically, middleware are functions that intercept route handlers, adding some kind of information. A middleware needs to be mounted using the method app.use(path, middlewareFunction). The first path argument is optional. If you don’t pass it, the middleware will be executed for all requests.
+
+Ex: app.use("/public", express.static(__dirname + "/public")) // path to the asset folder
+
+
+While an HTML server serves HTML, an API serves data. A REST (REpresentational State Transfer) API allows data exchange in a simple way, without the need for clients to know any detail about the server. The client only needs to know where the resource is (the URL), and the action it wants to perform on it (the verb). The GET verb is used when you are fetching some information, without modifying anything. These days, the preferred data format for moving information around the web is JSON. Simply put, JSON is a convenient way to represent a JavaScript object as a string, so it can be easily transmitted.
+
+The .env file is a hidden file that is used to pass environment variables to your application. This file is secret, no one but you can access it, and it can be used to store data that you want to keep private or hidden. For example, you can store API keys from external services or your database URI. You can also use it to store configuration options. By setting configuration options, you can change the behavior of your application, without the need to rewrite some code.
+
+The environment variables are accessible from the app as process.env.VAR_NAME. The process.env object is a global Node object, and variables are passed as strings. By convention, the variable names are all uppercase, with words separated by an underscore. The .env is a shell file, so you don’t need to wrap names or values in quotes. It is also important to note that there cannot be space around the equals sign when you are assigning values to your variables, e.g. VAR_NAME=value. Usually, you will put each variable definition on a separate line.
+
+To access we need dotenv package and need to be installed in App.js file 	require("dotenv").config();
+To use the value of env file we use	process.env.VAR_NAME	Ex:	process.env.MESSAGE_STYLE
+
+Earlier, you were introduced to the express.static() middleware function. Now it’s time to see what middleware is, in more detail. Middleware functions are functions that take 3 arguments: the request object, the response object, and the next function in the application’s request-response cycle. These functions execute some code that can have side effects on the app, and usually add information to the request or response objects. They can also end the cycle by sending a response when some condition is met. If they don’t send the response when they are done, they start the execution of the next function in the stack. This triggers calling the 3rd argument, next()
+
+Ex:
+function(req, res, next) {
+  console.log("I'm a middleware...");
+  next();
+}
+
+and rememeber that express follow the order of code line so if you want something to keep track with all interaction, put the root-level middleware before any other execution of app
+
+
+Middleware can be mounted at a specific route using app.METHOD(path, middlewareFunction). Middleware can also be chained within a route definition.
+
+Ex:
+app.get('/user', function(req, res, next) {
+  req.user = getTheUserSync();  // Hypothetical synchronous operation
+  next();
+}, function(req, res) {
+  res.send(req.user);
+});
+
+This approach is useful to split the server operations into smaller units. That leads to a better app structure, and the possibility to reuse code in different places. This approach can also be used to perform some validation on the data. At each point of the middleware stack you can block the execution of the current chain and pass control to functions specifically designed to handle errors. Or you can pass control to the next matching route, to handle special cases. We will see how in the advanced Express section.
+
+When building an API, we have to allow users to communicate to us what they want to get from our service. For example, if the client is requesting information about a user stored in the database, they need a way to let us know which user they're interested in. One possible way to achieve this result is by using route parameters. Route parameters are named segments of the URL, delimited by slashes (/). Each segment captures the value of the part of the URL which matches its position. The captured values can be found in the req.params object.
+
+Ex: 
+app.get("/:word/echo", (req, res) => {
+  res.json({"echo": req.params.word})
+})
+
+(because we denoted : before word so the input after / and before /echo will be the value of req.params.word )
+
+
+Another common way to get input from the client is by encoding the data after the route path, using a query string. The query string is delimited by a question mark (?), and includes field=value couples. Each couple is separated by an ampersand (&). Express can parse the data from the query string, and populate the object req.query. Some characters, like the percent (%), cannot be in URLs and have to be encoded in a different format before you can send them. If you use the API from JavaScript, you can use specific methods to encode/decode these characters.
+
+Use body-parser to Parse POST Requests
+Besides GET, there is another common HTTP verb, it is POST. POST is the default method used to send client data with HTML forms. In REST convention, POST is used to send data to create new items in the database (a new user, or a new blog post). You don’t have a database in this project, but you are going to learn how to handle POST requests anyway.
+
+In these kind of requests, the data doesn’t appear in the URL, it is hidden in the request body. The body is a part of the HTTP request, also called the payload. Even though the data is not visible in the URL, this does not mean that it is private. To see why, look at the raw content of an HTTP POST request:
+
+POST /path/subpath HTTP/1.0
+From: john@example.com
+User-Agent: someBrowser/1.0
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 20
+
+name=John+Doe&age=25
+As you can see, the body is encoded like the query string. This is the default format used by HTML forms. With Ajax, you can also use JSON to handle data having a more complex structure. There is also another type of encoding: multipart/form-data. This one is used to upload binary files. In this exercise, you will use a URL encoded body. To parse the data coming from POST requests, you must use the body-parser package. This package allows you to use a series of middleware, which can decode data in different formats.
+
+
+App JS method
+
+- .get(_dir, (req,res) => {})
+	dir is the directory that we access, we simply use '/' to denoted, then inside the function block, we will call method for res to response
+
+
+
+
+
+
+res method
+
+- .send("send a string")
+- .sendFile(path)	=>	run the path in file path 
+- .json(object)	   passing in an object as an argument. This method closes the request-response loop, returning the data. Behind the scenes, it converts a valid JavaScript object into a string, then sets the appropriate headers to tell your browser that you are serving JSON, and sends the data back.
+

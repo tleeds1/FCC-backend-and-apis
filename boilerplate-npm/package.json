@@ -1,6 +1,10 @@
 {
-	"author": "tleeds1",
 	"name": "fcc-learn-npm-package-json",
+	"author": "tleeds1",
+	"description": "A project named boilerplate-npm to learn backend",
+	"keywords": ["freecodecamp", "backend", "learning", "api"],
+	"license": "MIT",
+	"version": "1.2.0",
 	"dependencies": {
 		"express": "^4.14.0"
 	},
@@ -10,15 +14,6 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/freeCodeCamp/boilerplate-npm.git"
-	},
-	"version": "1.0.0",
-	"description": "This is the boilerplate code for the Managing Packages With npm Challenges. Instructions for working on these challenges start at https://www.freecodecamp.org/learn/back-end-development-and-apis/managing-packages-with-npm/",
-	"keywords": [],
-	"author": "",
-	"license": "ISC",
-	"bugs": {
-		"url": "https://github.com/freeCodeCamp/boilerplate-npm/issues"
-	},
-	"homepage": "https://github.com/freeCodeCamp/boilerplate-npm#readme"
+		"url": "https://github.com/freeCodeCamp/boilerplate-npm.git"
+	}
 }
